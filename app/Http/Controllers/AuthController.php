@@ -29,7 +29,10 @@ class AuthController extends Controller
 
     if (Auth::attempt($credentials)) {
         $request->session()->regenerate();
-        return redirect('/tiket'); // semua user ke halaman yang sama
+
+        // ✅ setelah login langsung ke halaman tiket
+        return redirect()->route('landing');
+        // atau: return redirect('/tiket');
     }
 
     return back()->withErrors([
@@ -77,6 +80,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('landing');
+        return redirect()->route('login');
     }
 }

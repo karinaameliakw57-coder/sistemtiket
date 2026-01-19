@@ -18,7 +18,7 @@ class PemesananController extends Controller
 
 
     // FORM TAMBAH PEMESANAN
-    /*public function create()
+    public function create()
     {
         $pengguna = Pengguna::all(); // pilih siapa pemesannya
         return view('pemesanan.create', compact('pengguna'));

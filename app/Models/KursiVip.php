@@ -8,14 +8,11 @@ class KursiVip extends Model
 {
     protected $table = 'kursi_vip';
 
-    protected $fillable = [
-        'pertandingan_id',
-        'nomor_kursi',
-        'status'
-    ];
+    protected $fillable = ['pertandingan_id', 'nomor_kursi', 'status'];
 
     public function pertandingan()
     {
-        return $this->belongsTo(Pertandingan::class);
+        return $this->belongsTo(Pertandingan::class, 'pertandingan_id');
+        // pastikan foreign key dan nama tabel sesuai DB kamu
     }
 }

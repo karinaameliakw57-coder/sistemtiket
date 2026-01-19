@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 class KursiVipController extends Controller
 {
 
-    public function index()
+   public function index()
 {
     $kursiVip = KursiVip::with('pertandingan')
         ->orderBy('pertandingan_id')
@@ -19,9 +19,11 @@ class KursiVipController extends Controller
 
     return view('kursi_vip.index', compact('kursiVip'));
 }
+
+
     // ===============================
     // FORM TAMBAH KURSI VIP (ADMIN)
-    // ===============================
+    // ======== =======================
     public function create()
     {
         $pertandingan = Pertandingan::all();
@@ -67,25 +69,24 @@ class KursiVipController extends Controller
     // ===============================
     // BELI & LOCK KURSI VIP
     // ===============================
-    public function beli(Request $request)
-    {
-        $request->validate([
-            'kursi_id' => 'required|exists:kursi_vip,id'
-        ]);
+   public function beli(Request $request)
+{
+    $request->validate([
+        'kursi_id' => 'required|array',
+        'kursi_id.*' => 'exists:kursi_vip,id',
+    ]);
 
-        DB::transaction(function () use ($request) {
-
-            $kursi = KursiVip::lockForUpdate()->find($request->kursi_id);
-
+    DB::transaction(function () use ($request) {
+        foreach ($request->kursi_id as $id) {
+            $kursi = KursiVip::lockForUpdate()->find($id);
             if ($kursi->status !== 'tersedia') {
-                abort(409, 'Kursi sudah dipesan');
+                abort(409, 'Kursi sudah dipesan: ' . $kursi->nomor_kursi);
             }
+            $kursi->update(['status' => 'dipesan']);
+        }
+    });
 
-            $kursi->update([
-                'status' => 'dipesan'
-            ]);
-        });
+    return redirect()->back()->with('success', 'Kursi VIP berhasil dipesan');
+}
 
-        return redirect()->back()->with('success', 'Kursi VIP berhasil dipesan');
-    }
 }

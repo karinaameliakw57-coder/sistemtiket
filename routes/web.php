@@ -2,29 +2,28 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\PublicTiketController;
-use App\Http\Controllers\PemesananController;
+use App\Http\Controllers\LandingController;
+use App\Http\Controllers\TiketController;
+use App\Http\Controllers\TiketOfflineController;
+use App\Http\Controllers\KursiVipController;
 use App\Http\Controllers\PenggunaController;
 use App\Http\Controllers\StadionController;
 use App\Http\Controllers\PertandinganController;
-use App\Http\Controllers\TiketController;
 use App\Http\Controllers\DetailPemesananController;
 use App\Http\Controllers\PembayaranController;
-use App\Http\Controllers\KursiVipController;
-use App\Http\Controllers\LandingController;
-use App\Http\Controllers\TiketOfflineController;
 
 /*
 |--------------------------------------------------------------------------
-| LANDING PAGE
+| ROOT → LOGIN
 |--------------------------------------------------------------------------
 */
-
-Route::get('/', [LandingController::class, 'index'])->name('landing');
+Route::get('/', function () {
+    return redirect()->route('login');
+});
 
 /*
 |--------------------------------------------------------------------------
-| AUTH
+| AUTH (PUBLIC)
 |--------------------------------------------------------------------------
 */
 Route::get('/login', [AuthController::class, 'loginForm'])->name('login');
@@ -37,55 +36,51 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 /*
 |--------------------------------------------------------------------------
-| ADMIN (WAJIB LOGIN)
+| WAJIB LOGIN
 |--------------------------------------------------------------------------
 */
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | TIKET VIP
+    | LANDING (SETELAH LOGIN)
     |--------------------------------------------------------------------------
     */
-    Route::get('/tiket/vip/create', [TiketController::class, 'createVip'])
-        ->name('tiket.vip.create');
-
-    Route::post('/tiket/vip/store', [TiketController::class, 'storeVip'])
-        ->name('tiket.vip.store');
-
-    Route::get('/tiket/vip/{pertandingan}', [TiketController::class, 'halamanVip'])
-        ->name('tiket.vip.halaman');
-
-    Route::post('/tiket/vip/beli', [KursiVipController::class, 'beli'])
-        ->name('tiket.vip.beli');
+    Route::get('/landing', [LandingController::class, 'index'])
+        ->name('landing');
 
     /*
     |--------------------------------------------------------------------------
-    | TIKET OFFLINE + CART (WAJIB URUTAN INI)
+    | TIKET
     |--------------------------------------------------------------------------
     */
-    Route::get('/tiket-offline', [TiketOfflineController::class, 'index'])
-        ->name('tiket.offline.index');
+    Route::resource('tiket', TiketController::class);
 
-    Route::get('/tiket-offline/cart', [TiketOfflineController::class, 'cart'])
-        ->name('tiket.offline.cart');
+    /*
+    |--------------------------------------------------------------------------
+    | TIKET OFFLINE
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/tiket-offline', [TiketOfflineController::class, 'index'])->name('tiket.offline.index');
 
-    Route::post('/tiket-offline/cart/add', [TiketOfflineController::class, 'addToCart'])
-        ->name('tiket.offline.cart.add');
+Route::get('/tiket-offline/create/{tiket}', [TiketOfflineController::class, 'create'])->name('tiket.offline.create');
 
-    Route::post('/tiket-offline/checkout', [TiketOfflineController::class, 'checkout'])
-        ->name('tiket.offline.checkout');
+Route::post('/tiket-offline/store', [TiketOfflineController::class, 'store'])->name('tiket.offline.store');
 
-    Route::get('/tiket-offline/{tiket}', [TiketOfflineController::class, 'create'])
-        ->name('tiket.offline.create');
+// Route untuk melihat keranjang
+Route::get('/tiket-offline/cart', [TiketOfflineController::class, 'cart'])->name('tiket.offline.cart');
 
-    Route::post('/tiket-offline', [TiketOfflineController::class, 'store'])
-        ->name('tiket.offline.store');
-    Route::post(
-        '/tiket-offline/cart/remove',
-        [TiketOfflineController::class, 'removeFromCart']
-    )->name('tiket.offline.cart.remove');
+// Route untuk menambah tiket ke keranjang
+Route::post('/tiket-offline/cart/add', [TiketOfflineController::class, 'addToCart'])->name('tiket.offline.cart.add');
 
+// Route untuk menghapus tiket dari keranjang
+Route::post('/tiket-offline/cart/remove', [TiketOfflineController::class, 'removeFromCart'])->name('tiket.offline.cart.remove');
+
+// Route untuk checkout
+Route::post('/tiket-offline/checkout', [TiketOfflineController::class, 'checkout'])->name('tiket.offline.checkout');
+
+// Route untuk struk pemesanan offline
+Route::get('/tiket-offline/struk/{id}', [TiketOfflineController::class, 'struk'])->name('tiket.offline.struk');
 
     /*
     |--------------------------------------------------------------------------
@@ -95,9 +90,9 @@ Route::middleware('auth')->group(function () {
     Route::resource('pengguna', PenggunaController::class);
     Route::resource('stadion', StadionController::class);
     Route::resource('pertandingan', PertandinganController::class);
-    Route::resource('tiket', TiketController::class);
-    Route::resource('pemesanan', PemesananController::class);
     Route::resource('detail-pemesanan', DetailPemesananController::class);
     Route::resource('pembayaran', PembayaranController::class);
     Route::resource('kursi-vip', KursiVipController::class);
+    Route::get('/tiket-vip/create', [KursiVipController::class, 'create'])->name('tiket-vip.create');
+
 });

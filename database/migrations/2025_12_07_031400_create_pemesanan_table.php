@@ -18,7 +18,7 @@ return new class extends Migration
     $table->string('email');
     $table->string('no_hp');
     $table->integer('jumlah');
-    $table->string('status')->default('menunggu');
+    $table->string('statusPemesanan');
     $table->timestamps();
 });
 

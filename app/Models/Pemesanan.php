@@ -8,9 +8,10 @@ class Pemesanan extends Model
 {
     protected $table = 'pemesanan';
 
+    protected $primaryKey = 'id';
+
+
     protected $fillable = [
-        'idPengguna',
-        'tanggalPemesanan',
         'statusPemesanan'
     ];
 
@@ -21,7 +22,7 @@ class Pemesanan extends Model
     }
 
     // Relasi: Pemesanan memiliki banyak Detail
-    public function detail()
+    public function details()
     {
         return $this->hasMany(DetailPemesanan::class, 'idPemesanan');
     }
@@ -30,5 +31,10 @@ class Pemesanan extends Model
     public function pembayaran()
     {
         return $this->hasOne(Pembayaran::class, 'idPemesanan');
+    }
+
+    public function tiket()
+    {
+        return $this->belongsTo(Tiket::class, 'tiket_id');
     }
 }
