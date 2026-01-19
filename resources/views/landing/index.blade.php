@@ -33,7 +33,7 @@
 
 
                             @auth
-                                <a href="{{ route('tiket.show', $item->id) }}" class="btn btn-success w-100">
+                                <a href="{{ route('tiket.index') }}" class="btn btn-success w-100">
                                     Beli Tiket
                                 </a>
                             @else

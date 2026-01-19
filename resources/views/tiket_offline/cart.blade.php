@@ -41,8 +41,16 @@
                         <td>Rp {{ number_format($item['harga']) }}</td>
                         <td>{{ $item['qty'] }}</td>
                         <td>Rp {{ number_format($subtotal) }}</td>
-                        <td>
-                            <form action="{{ route('tiket.offline.cart.remove') }}" method="POST">
+                        <td class="d-flex gap-1">
+                            {{-- Form tambah qty --}}
+                            <form action="{{ route('tiket.offline.cart.add') }}" method="POST" style="display:inline;">
+                                @csrf
+                                <input type="hidden" name="tiket_id" value="{{ $item['tiket_id'] }}">
+                                <button type="submit" class="btn btn-primary btn-sm">+</button>
+                            </form>
+
+                            {{-- Form hapus tiket --}}
+                            <form action="{{ route('tiket.offline.cart.remove') }}" method="POST" style="display:inline;">
                                 @csrf
                                 <input type="hidden" name="tiket_id" value="{{ $item['tiket_id'] }}">
                                 <button class="btn btn-danger btn-sm">Hapus</button>
@@ -63,6 +71,9 @@
             <button class="btn btn-success">
                 Checkout & Simpan Transaksi
             </button>
+              <a href="{{ route('tiket.offline.index') }}" class="btn btn-secondary">
+                Kembali
+            </a>
         </form>
     @endif
 </div>

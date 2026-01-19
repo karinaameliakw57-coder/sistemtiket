@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Tiket;
 use App\Models\Pemesanan;
 use App\Models\DetailPemesanan;
+use App\Models\KursiVip;
 use Illuminate\Support\Facades\DB;
 
 class TiketOfflineController extends Controller
@@ -71,7 +72,7 @@ class TiketOfflineController extends Controller
     // =========================
     // CHECKOUT OFFLINE
     // =========================
-  public function checkout()
+ public function checkout()
 {
     $cart = session()->get('cart', []);
 
@@ -98,11 +99,28 @@ class TiketOfflineController extends Controller
                 'subtotal'    => $item['qty'] * $item['harga'],
             ]);
 
-            // Kurangi stok tiket sesuai kolom 'jumlahTersedia'
             $tiket = Tiket::find($item['tiket_id']);
             if ($tiket) {
-                $tiket->jumlahTersedia = max(0, $tiket->jumlahTersedia - $item['qty']);
-                $tiket->save();
+                if ($tiket->kategoriKursi === 'VIP') {
+                    // Kurangi stok kursi VIP: update status kursi dari 'tersedia' ke 'dipesan'
+                    $kursiVipTersedia = KursiVip::where('pertandingan_id', $tiket->idPertandingan)
+                                                 ->where('status', 'tersedia')
+                                                 ->limit($item['qty'])
+                                                 ->lockForUpdate()
+                                                 ->get();
+
+                    if ($kursiVipTersedia->count() < $item['qty']) {
+                        throw new \Exception('Kursi VIP tidak cukup tersedia.');
+                    }
+
+                    foreach ($kursiVipTersedia as $kursi) {
+                        $kursi->update(['status' => 'dipesan']);
+                    }
+                } else {
+                    // Kurangi stok tiket biasa
+                    $tiket->jumlahTersedia = max(0, $tiket->jumlahTersedia - $item['qty']);
+                    $tiket->save();
+                }
             }
         }
 
