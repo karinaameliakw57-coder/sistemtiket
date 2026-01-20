@@ -25,7 +25,7 @@
                             </h5>
 
                             <p class="mb-1">
-                                🏟️ {{ $item->stadion->nama ?? 'Nama Stadion' }}
+                                🏟️ {{ $item->stadion->namaStadion ?? 'Nama Stadion' }}
                             </p>
                             <p class="mb-2">
                                 📅 {{ \Carbon\Carbon::parse($item->tanggal)->format('d M Y') }}

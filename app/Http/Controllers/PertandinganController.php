@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Pertandingan;
 use App\Models\Stadion;
+use App\Models\Tiket;
+use App\Models\Pemesanan;
+use App\Models\DetailPemesanan;
 use Illuminate\Http\Request;
 
 class PertandinganController extends Controller
@@ -41,11 +44,22 @@ class PertandinganController extends Controller
     }
 
     // HAPUS DATA
-    public function destroy($id)
-    {
-        Pertandingan::findOrFail($id)->delete();
+public function destroy($id)
+{
+    // Ambil semua tiket yang terkait pertandingan
+    $tiketIds = Tiket::where('idPertandingan', $id)->pluck('id');
 
-        return redirect()->route('pertandingan.index')
-                         ->with('success', 'Data pertandingan berhasil dihapus!');
-    }
+    // Hapus detail pemesanan yang terkait tiket tersebut
+    DetailPemesanan::whereIn('idTiket', $tiketIds)->delete();
+
+    // Hapus tiket yang terkait pertandingan
+    Tiket::whereIn('id', $tiketIds)->delete();
+
+    // Hapus pertandingan
+    Pertandingan::findOrFail($id)->delete();
+
+    return redirect()->route('pertandingan.index')
+                     ->with('success', 'Data pertandingan berhasil dihapus!');
+}
+
 }

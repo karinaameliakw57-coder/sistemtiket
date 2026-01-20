@@ -11,6 +11,7 @@ use App\Http\Controllers\StadionController;
 use App\Http\Controllers\PertandinganController;
 use App\Http\Controllers\DetailPemesananController;
 use App\Http\Controllers\PembayaranController;
+use App\Http\Controllers\LaporanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -94,5 +95,7 @@ Route::get('/tiket-offline/struk/{id}', [TiketOfflineController::class, 'struk']
     Route::resource('pembayaran', PembayaranController::class);
     Route::resource('kursi-vip', KursiVipController::class);
     Route::get('/tiket-vip/create', [KursiVipController::class, 'create'])->name('tiket-vip.create');
+    Route::get('/laporan-penjualan', [LaporanController::class, 'laporanPenjualan'])
+    ->name('laporan.penjualan');
 
 });
